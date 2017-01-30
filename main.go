@@ -1,11 +1,15 @@
 package main
 
 import (
-	"io/ioutil"
 	"os"
 
 	"github.com/gin-gonic/gin"
 )
+
+type Challenge struct {
+	Token   string `json:"token"`
+	AuthKey string `json:"auth_key"`
+}
 
 var challenges = map[string]string{}
 
@@ -19,12 +23,19 @@ func getToken(c *gin.Context) {
 }
 
 func setToken(c *gin.Context) {
-	token := c.Param("token")
-	data, err := ioutil.ReadAll(c.Request.Body)
-	if err != nil {
+	challenge := Challenge{}
+
+	if err := c.BindJSON(&challenge); err != nil {
+		c.String(400, err.Error())
 		return
 	}
-	challenges[token] = string(data)
+
+	if challenge.Token == "" || challenge.AuthKey == "" {
+		c.String(400, "Invalid data")
+		return
+	}
+
+	challenges[challenge.Token] = challenge.AuthKey
 	c.String(200, "OK")
 }
 
@@ -36,6 +47,6 @@ func main() {
 
 	router := gin.Default()
 	router.GET("/:token", getToken)
-	router.POST("/:token", setToken)
+	router.POST("/", setToken)
 	router.Run(":" + port)
 }
