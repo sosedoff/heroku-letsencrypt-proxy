@@ -1,7 +1,7 @@
 {
 	"ImportPath": "github.com/sosedoff/heroku-letsencrypt-proxy",
 	"GoVersion": "go1.7",
-	"GodepVersion": "v78",
+	"GodepVersion": "v79",
 	"Packages": [
 		"./..."
 	],
